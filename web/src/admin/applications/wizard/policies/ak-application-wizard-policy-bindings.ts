@@ -6,6 +6,9 @@ import "@goauthentik/components/ak-radio-input";
 import "@goauthentik/components/ak-slug-input";
 import "@goauthentik/components/ak-switch-input";
 import "@goauthentik/components/ak-text-input";
+import { Toolbar } from "@goauthentik/elements/ak-table/Toolbar";
+import "@goauthentik/elements/ak-table/ak-select-table.js";
+import { bound } from "@goauthentik/elements/decorators/bound";
 import "@goauthentik/elements/forms/FormGroup";
 import "@goauthentik/elements/forms/HorizontalFormElement";
 
@@ -13,14 +16,42 @@ import { msg } from "@lit/localize";
 import { customElement } from "@lit/reactive-element/decorators/custom-element.js";
 import { html } from "lit";
 
+import PFButton from "@patternfly/patternfly/components/Button/button.css";
+
 // import { ifDefined } from "lit/directives/if-defined.js";
 import BasePanel from "../BasePanel";
 
+const COLUMNS = [
+    [msg("Order"), "order"],
+    [msg("Binding")],
+    [msg("Enabled"), "enabled"],
+    [msg("Timeout"), "timeout"],
+    [msg("Actions")],
+];
+
+@customElement("ak-application-wizard-policy-bindings-toolbar")
+export class ApplicationWizardPolicyBindingsToolbar extends Toolbar {
+    static get styles() {
+        return [...Toolbar.styles, PFButton];
+    }
+
+    public override renderToolbar() {
+        return html`<button slot="trigger" class="pf-c-button pf-m-primary">
+            ${msg("Bind existing policy/group/user")}
+        </button>`;
+    }
+}
+
 @customElement("ak-application-wizard-policy-bindings")
 export class ApplicationWizardPolicyBindings extends BasePanel {
-    render() {
-        if (this.wizard.policies.length === 0) {
-            return html`<ak-empty-state header=${msg("No bound policies.")} icon="pf-icon-module">
+    renderEmptyCollection() {
+        return html` <ak-select-table
+                multiple
+                order="order"
+                .columns=${COLUMNS}
+                .content=${[]}
+            ></ak-select-table>
+            <ak-empty-state header=${msg("No bound policies.")} icon="pf-icon-module">
                 <div slot="body">${msg("No policies are currently bound to this object.")}</div>
                 <div slot="primary">
                     <ak-forms-modal size=${PFSize.Medium}>
@@ -33,6 +64,28 @@ export class ApplicationWizardPolicyBindings extends BasePanel {
                     </ak-forms-modal>
                 </div>
             </ak-empty-state>`;
+    }
+
+    @bound
+    onClick(ev: PointerEvent) {
+        console.log(ev);
+    }
+
+    renderCollection() {
+        return html`<ak-application-wizard-policy-bindings-toolbar
+                @click=${this.onClick}
+            ></ak-application-wizard-policy-bindings-toolbar>
+            <ak-select-table
+                multiple
+                order="order"
+                .columns=${COLUMNS}
+                .content=${[]}
+            ></ak-select-table> `;
+    }
+
+    render() {
+        if (this.wizard.policies.length === 0) {
+            return this.renderCollection();
         }
 
         return html`<p>Nothing to see here. Move along.</p>`;

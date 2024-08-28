@@ -1,7 +1,7 @@
 import { bound } from "@goauthentik/elements/decorators/bound";
 
 import { msg } from "@lit/localize";
-import { PropertyValues, TemplateResult, html } from "lit";
+import { PropertyValues, TemplateResult, css, html } from "lit";
 import { customElement, property, queryAll } from "lit/decorators.js";
 import { map } from "lit/directives/map.js";
 
@@ -91,6 +91,22 @@ export interface ISelectTable extends ISimpleTable {
 
 @customElement("ak-select-table")
 export class SelectTable extends SimpleTable {
+    static get styles() {
+        return [
+            SimpleTable.styles,
+            css`
+                .pf-c-table.pf-m-compact tr:not(.pf-c-table__expandable-row) > *:first-child {
+                    padding-left: var(--pf-global--spacer--sm);
+                    width: calc(1.4ch + var(--pf-global--spacer--sm));
+                    min-width: calc(1.4ch + var(--pf-global--spacer--sm));
+                }
+                .pf-c-table tr > * {
+                    max-width: initial;
+                }
+            `,
+        ];
+    }
+
     // WARNING: This property and `set selected` must mirror each other perfectly.
     @property({ type: String, attribute: true, reflect: true })
     public set value(value: string) {
@@ -188,7 +204,7 @@ export class SelectTable extends SimpleTable {
         // receives the state; the second ensures the input tag on the page reflects the state
         // accurately. See https://github.com/lit/lit-element/issues/601
         const checked = this.selected.includes(key);
-        return html`<td part="select-cell" class="pf-c-table__check" role="cell">
+        return html`<td part="select-cell" class="pf-c-table__check ak-m-fit-control" role="cell">
             <input
                 type="checkbox"
                 name="${key}"
@@ -233,7 +249,11 @@ export class SelectTable extends SimpleTable {
                   this.selected.filter((i) => !values.includes(i));
         };
 
-        return html`<th part="select-all-header" class="pf-c-table__check" role="cell">
+        return html`<th
+            part="select-all-header"
+            class="pf-c-table__check ak-m-fit-control"
+            role="cell"
+        >
             <input
                 part="select-all-input"
                 name="select-all-input"
