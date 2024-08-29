@@ -133,8 +133,7 @@ export class PolicyBindingForm extends ModelForm<PolicyBinding, string> {
     }
 
     renderForm(): TemplateResult {
-        return html`<!-- -->
-            <div class="pf-c-card pf-m-selectable pf-m-selected">
+        return html` <div class="pf-c-card pf-m-selectable pf-m-selected">
                 <div class="pf-c-card__body">${this.renderModeSelector()}</div>
                 <div class="pf-c-card__footer">
                     <ak-form-element-horizontal

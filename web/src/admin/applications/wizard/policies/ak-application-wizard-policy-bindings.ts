@@ -13,13 +13,17 @@ import "@goauthentik/elements/forms/FormGroup";
 import "@goauthentik/elements/forms/HorizontalFormElement";
 
 import { msg } from "@lit/localize";
-import { customElement } from "@lit/reactive-element/decorators/custom-element.js";
 import { html } from "lit";
+import { customElement, state } from "lit/decorators.js";
+import { ifDefined } from "lit/directives/if-defined.js";
 
 import PFButton from "@patternfly/patternfly/components/Button/button.css";
 
+import { PolicyBinding } from "@goauthentik/api";
+
 // import { ifDefined } from "lit/directives/if-defined.js";
 import BasePanel from "../BasePanel";
+import "./ak-policy-binding-form.js";
 
 const COLUMNS = [
     [msg("Order"), "order"],
@@ -42,8 +46,28 @@ export class ApplicationWizardPolicyBindingsToolbar extends Toolbar {
     }
 }
 
+const _pageStates = ["table", "form"] as const;
+type PageState = (typeof _pageStates)[number];
+
 @customElement("ak-application-wizard-policy-bindings")
 export class ApplicationWizardPolicyBindings extends BasePanel {
+    @state()
+    pageState: PageState = "table";
+
+    @state()
+    instance?: PolicyBinding;
+
+    @bound
+    onClick(ev: Event) {
+        ev.stopPropagation();
+        this.pageState = this.pageState === "table" ? "form" : "table";
+    }
+
+    renderPolicyBindingForm() {
+        return html`<ak-policy-binding-form-view .instance=${ifDefined(this.instance)}>
+        </ak-policy-binding-form-view>`;
+    }
+
     renderEmptyCollection() {
         return html` <ak-select-table
                 multiple
@@ -58,17 +82,16 @@ export class ApplicationWizardPolicyBindings extends BasePanel {
                         <span slot="submit"> ${msg("Create")} </span>
                         <span slot="header"> ${msg("Create Binding")} </span>
                         <p>Insert static binding form here</p>
-                        <button slot="trigger" class="pf-c-button pf-m-primary">
+                        <button
+                            @click=${this.onClick}
+                            slot="trigger"
+                            class="pf-c-button pf-m-primary"
+                        >
                             ${msg("Bind existing policy/group/user")}
                         </button>
                     </ak-forms-modal>
                 </div>
             </ak-empty-state>`;
-    }
-
-    @bound
-    onClick(ev: PointerEvent) {
-        console.log(ev);
     }
 
     renderCollection() {
@@ -84,11 +107,15 @@ export class ApplicationWizardPolicyBindings extends BasePanel {
     }
 
     render() {
-        if (this.wizard.policies.length === 0) {
-            return this.renderCollection();
+        if (this.pageState === "form") {
+            return this.renderPolicyBindingForm();
         }
 
-        return html`<p>Nothing to see here. Move along.</p>`;
+        if (this.wizard.policies.length === 0) {
+            return this.renderEmptyCollection();
+        }
+
+        return this.renderCollection();
     }
 }
 

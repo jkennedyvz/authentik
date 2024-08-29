@@ -1,9 +1,33 @@
+import { DEFAULT_CONFIG } from "@goauthentik/common/api/config";
+import { groupBy } from "@goauthentik/common/utils";
+import "@goauthentik/components/ak-toggle-group";
+import { AKElement } from "@goauthentik/elements/Base.js";
+import "@goauthentik/elements/forms/HorizontalFormElement";
+import "@goauthentik/elements/forms/Radio";
+import "@goauthentik/elements/forms/SearchSelect";
 import { ISearchSelectApi } from "@goauthentik/elements/forms/SearchSelect/ak-search-select-ez.js";
 import "@goauthentik/elements/forms/SearchSelect/ak-search-select-ez.js";
 
-const withQuery = <T>(search: string | undefined, args: T) => (query ? { ...args, search } : args);
+import { msg } from "@lit/localize";
+import { html } from "lit";
+import { customElement, property, state } from "lit/decorators.js";
 
-const SearchConfig = ISearchSelectApi<Policy> | ISearchSelectApi<Group> | ISearchSelectApi<User>;
+import { CoreApi, Group, PoliciesApi, Policy, PolicyBinding, User } from "@goauthentik/api";
+
+const withQuery = <T>(search: string | undefined, args: T) => (search ? { ...args, search } : args);
+
+type SearchConfig = ISearchSelectApi<Policy> | ISearchSelectApi<Group> | ISearchSelectApi<User>;
+
+enum target {
+    policy = "policy",
+    group = "group",
+    user = "user",
+}
+
+const PASS_FAIL = [
+    [msg("Pass"), true, false],
+    [msg("Don't Pass"), false, true],
+].map(([label, value, d]) => ({ label, value, default: d }));
 
 @customElement("ak-policy-binding-form-view")
 export class PolicyBindingFormView extends AKElement {
@@ -13,13 +37,17 @@ export class PolicyBindingFormView extends AKElement {
     @property({ type: Object, attribute: false })
     instance?: PolicyBinding;
 
+    @state()
+    defaultOrder = 0;
+
     get policySearchConfig() {
         return {
             fetchObjects: async (query?: string): Promise<Policy[]> => {
-                const args: PoliciesAllListRequest = withQuery(query, {
-                    ordering: "name",
-                });
-                const policies = await new PoliciesApi(DEFAULT_CONFIG).policiesAllList(args);
+                const policies = await new PoliciesApi(DEFAULT_CONFIG).policiesAllList(
+                    withQuery(query, {
+                        ordering: "name",
+                    }),
+                );
                 return policies.results;
             },
             groupBy: (items: Policy[]) => groupBy(items, (policy) => policy.verboseNamePlural),
@@ -32,11 +60,12 @@ export class PolicyBindingFormView extends AKElement {
     get groupSearchConfig() {
         return {
             fetchObjects: async (query?: string): Promise<Group[]> => {
-                const args: CoreGroupsListRequest = withQuery(query, {
-                    ordering: "name",
-                    includeUsers: false,
-                });
-                const groups = await new CoreApi(DEFAULT_CONFIG).coreGroupsList(args);
+                const groups = await new CoreApi(DEFAULT_CONFIG).coreGroupsList(
+                    withQuery(query, {
+                        ordering: "name",
+                        includeUsers: false,
+                    }),
+                );
                 return groups.results;
             },
             renderElement: (group: Group): string => group.name,
@@ -48,10 +77,11 @@ export class PolicyBindingFormView extends AKElement {
     get userSearchConfig() {
         return {
             fetchObjects: async (query?: string): Promise<User[]> => {
-                const args: CoreUsersListRequest = withQuery(query, {
-                    ordering: "username",
-                });
-                const users = await new CoreApi(DEFAULT_CONFIG).coreUsersList(args);
+                const users = await new CoreApi(DEFAULT_CONFIG).coreUsersList(
+                    withQuery(query, {
+                        ordering: "username",
+                    }),
+                );
                 return users.results;
             },
             renderElement: (user: User): string => user.username,
@@ -61,7 +91,7 @@ export class PolicyBindingFormView extends AKElement {
         };
     }
 
-    renderModeSelector(): TemplateResult {
+    renderModeSelector() {
         return html` <ak-toggle-group
             value=${this.policyGroupUser}
             @ak-toggle=${(ev: CustomEvent<{ value: target }>) => {
@@ -80,7 +110,7 @@ export class PolicyBindingFormView extends AKElement {
             name="policy"
             ?hidden=${this.policyGroupUser !== policyKind}
         >
-            <ak-search-select-ez config=${config} blankable></ak-search-select-ez>
+            <ak-search-select-ez .config=${config} blankable></ak-search-select-ez>
         </ak-form-element-horizontal>`;
     }
 
@@ -91,20 +121,20 @@ export class PolicyBindingFormView extends AKElement {
                 ${this.renderSearch(
                     msg("Policy"),
                     "policy",
-                    target.policy,
                     this.policySearchConfig,
+                    target.policy,
                 )}
-                ${this.renderSearch(msg("Group"), "group", target.group, this.groupSearchConfig)}
-                ${this.renderSearch(msg("User"), "user", target.user, this.userSearchConfig)}
+                ${this.renderSearch(msg("Group"), "group", this.groupSearchConfig, target.group)}
+                ${this.renderSearch(msg("User"), "user", this.userSearchConfig, target.user)}
             </div>
             <ak-switch-input
                 name="enabled"
-                ?checked=${first(this.instance?.enabled, true)}
+                ?checked=${this.instance?.enabled ?? true}
                 label=${msg("Enabled")}
             ></ak-switch-input>
             <ak-switch-input
                 name="negate"
-                ?checked=${first(this.instance?.negate, false)}
+                ?checked=${this.instance?.negate ?? false}
                 label=${msg("Negate result")}
                 help=${msg("Negates the outcome of the binding. Messages are unaffected.")}
             ></ak-switch-input>
@@ -117,14 +147,20 @@ export class PolicyBindingFormView extends AKElement {
             <ak-number-input
                 label=${msg("Timeout")}
                 name="timeout"
-                value="${first(this.instance?.timeout, 30)}"
+                value="${this.instance?.timeout ?? 30}"
                 required
             ></ak-number-input>
             <ak-radio-input
                 name="failureResult"
                 label=${msg("Failure result")}
-                options=${PASS_FAIL}
+                .options=${PASS_FAIL}
             ></ak-radio-input>
         </div>`;
+    }
+}
+
+declare global {
+    interface HTMLElementTagNameMap {
+        "ak-policy-binding-form-view": PolicyBindingFormView;
     }
 }
