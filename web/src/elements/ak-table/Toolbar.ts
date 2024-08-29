@@ -1,9 +1,11 @@
 import { AKElement } from "@goauthentik/elements/Base";
 
-import { css, html, nothing } from "lit";
+import { TemplateResult, css, html, nothing } from "lit";
 
 import PFToolbar from "@patternfly/patternfly/components/Toolbar/toolbar.css";
 import PFBase from "@patternfly/patternfly/patternfly-base.css";
+
+type Renderer = TemplateResult | typeof nothing;
 
 export class Toolbar extends AKElement {
     static get styles() {
@@ -18,23 +20,23 @@ export class Toolbar extends AKElement {
         ];
     }
 
-    public renderSearch() {
+    public renderSearch(): Renderer {
         return nothing;
     }
 
-    public renderToolbar() {
+    public renderToolbar(): Renderer {
         return nothing;
     }
 
-    public renderToolbarSelected() {
+    public renderToolbarSelected(): Renderer {
         return nothing;
     }
 
-    public renderToolbarAfter() {
+    public renderToolbarAfter(): Renderer {
         return nothing;
     }
 
-    public renderTablePagination() {
+    public renderTablePagination(): Renderer {
         return nothing;
     }
 

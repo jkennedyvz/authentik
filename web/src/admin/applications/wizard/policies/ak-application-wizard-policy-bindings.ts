@@ -15,7 +15,6 @@ import "@goauthentik/elements/forms/HorizontalFormElement";
 import { msg } from "@lit/localize";
 import { html } from "lit";
 import { customElement, state } from "lit/decorators.js";
-import { ifDefined } from "lit/directives/if-defined.js";
 
 import PFButton from "@patternfly/patternfly/components/Button/button.css";
 
@@ -64,7 +63,7 @@ export class ApplicationWizardPolicyBindings extends BasePanel {
     }
 
     renderPolicyBindingForm() {
-        return html`<ak-policy-binding-form-view .instance=${ifDefined(this.instance)}>
+        return html`<ak-policy-binding-form-view .instance=${this.instance}>
         </ak-policy-binding-form-view>`;
     }
 
