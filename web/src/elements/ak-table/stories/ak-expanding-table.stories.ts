@@ -1,12 +1,13 @@
 import { Meta, StoryObj } from "@storybook/web-components";
 import { slug } from "github-slugger";
 
-import { LitElement, TemplateResult, css, html } from "lit";
+import { LitElement, TemplateResult, html } from "lit";
 import { customElement, state } from "lit/decorators.js";
 
 import { TableSortEvent } from "../TableColumn.js";
 import "../ak-expandable-table.js";
 import { ExpandableTable } from "../ak-expandable-table.js";
+import { type TableFlat } from "../types";
 import "./ak-gradient-demo.js";
 import { nutritionDbUSDA } from "./sample_nutrition_db.js";
 

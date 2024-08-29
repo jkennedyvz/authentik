@@ -99,13 +99,15 @@ export class TableView extends FullTableBase {
     // preserving room for the select control.
     @bound
     public override renderRow(row: TableRow) {
-        const expanded = this.expandedRows.includes(row.key);
+        const expanded = row.key !== undefined && this.expandedRows.includes(row.key);
         const expandedClass = { "pf-m-expanded": expanded };
         return html`
             <tr part="row" value=${ifDefined(row.key)} class=${classMap(expandedClass)}>
                 ${this.renderCheckbox(row.key)}
                 <!-- prettier-ignore -->
-                ${this.renderExpansionControl(row.key, expanded)}
+                ${row.key !== undefined
+                    ? this.renderExpansionControl(row.key, expanded)
+                    : html`<td></td>`}
                 ${map(
                     row.content,
                     (col, idx) => html`<td part="cell cell-${idx}" role="cell">${col}</td>`,

@@ -1,4 +1,4 @@
-import { LitElement, css, html } from "lit";
+import { LitElement, TemplateResult, css, html } from "lit";
 import { customElement } from "lit/decorators.js";
 
 @customElement("ak-demo-gradient")
@@ -44,11 +44,11 @@ export class AkGradientMultiline extends LitElement {
         `;
     }
 
-    content = "";
+    content: string | TemplateResult = "";
 
     connectedCallback() {
         super.connectedCallback();
-        this.content = this.textContent;
+        this.content = this.textContent ?? html`<marquee>No content found?</marquee>`;
     }
 
     render() {

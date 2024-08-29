@@ -68,11 +68,13 @@ export class ExpandableTable extends ExpandableTableBase implements ISimpleTable
     // override adds the expandable control and expandable row rendering to this method.
     @bound
     public override renderRow(row: TableRow) {
-        const expanded = this.expandedRows.includes(row.key);
+        const expanded = row.key !== undefined && this.expandedRows.includes(row.key);
         const expandedClass = { "pf-m-expanded": expanded };
         return html`
             <tr part="row" class=${classMap(expandedClass)}>
-                ${this.renderExpansionControl(row.key, expanded)}
+                ${row.key !== undefined
+                    ? this.renderExpansionControl(row.key, expanded)
+                    : html`<td></td>`}
                 ${map(
                     row.content,
                     (col, idx) => html`<td part="cell cell-${idx}" role="cell">${col}</td>`,

@@ -42,12 +42,14 @@ export function ExpansionRenderer<T extends Constructor<SimpleTable>>(superclass
         trows!: HTMLTableRowElement[];
 
         get tvalues() {
-            return Array.from(this.trows).map((tr) => tr.getAttribute("value"));
+            return Array.from(this.trows)
+                .map((tr) => tr.getAttribute("value"))
+                .filter((tr) => tr !== null);
         }
 
         get expandedOnThisPage() {
             const expanded = new Set(this.expandedRows);
-            return this.tvalues.filter((value) => expanded.has(value));
+            return this.tvalues.filter((value) => value !== null && expanded.has(value));
         }
 
         get allOpen() {
@@ -105,7 +107,8 @@ export function ExpansionRenderer<T extends Constructor<SimpleTable>>(superclass
         @bound
         renderExpansion(row: TableRow, expanded: boolean) {
             const columns = this.columns.length + 1;
-            return row.expansion && expanded
+            const hasKey = row.key !== undefined;
+            return hasKey && row.expansion && expanded
                 ? html` <tr
                       part="expansion-row"
                       key=${ifDefined(row.key)}

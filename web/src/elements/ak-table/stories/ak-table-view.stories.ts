@@ -7,6 +7,7 @@ import { customElement, property, state } from "lit/decorators.js";
 import { TableSortEvent } from "../TableColumn.js";
 import "../ak-table-view.js";
 import { TableView } from "../ak-table-view.js";
+import { type TableFlat } from "../types";
 import "./ak-gradient-demo.js";
 import { nutritionDbUSDA } from "./sample_nutrition_db.js";
 
