@@ -2,17 +2,17 @@ import { Meta, StoryObj } from "@storybook/web-components";
 import { slug } from "github-slugger";
 
 import { LitElement, TemplateResult, html } from "lit";
-import { customElement, state } from "lit/decorators.js";
+import { customElement, property, state } from "lit/decorators.js";
 
 import { TableSortEvent } from "../TableColumn.js";
-import "../ak-expandable-table.js";
-import { ExpandableTable } from "../ak-expandable-table.js";
+import "../ak-table-view.js";
+import { TableView } from "../ak-table-view.js";
 import { type TableFlat } from "../types";
 import "./ak-gradient-demo.js";
 import { nutritionDbUSDA } from "./sample_nutrition_db.js";
 
-const metadata: Meta<ExpandableTable> = {
-    title: "Elements / Table / <ak-expandable-table>",
+const metadata: Meta<TableView> = {
+    title: "Elements / Table / <ak-table-view>",
     component: "ak-expanding-table",
     parameters: {
         docs: {
@@ -67,18 +67,16 @@ const content: TableFlat = {
 
 export const Default: Story = {
     render: () =>
-        container(
-            html`<ak-expandable-table
-                .columns=${columns}
-                .content=${content}
-            ></ak-expandable-table>`,
-        ),
+        container(html`<ak-table-view .columns=${columns} .content=${content}></ak-table-view>`),
 };
 
 type Ord = Record<string | number, string | number>;
 
-@customElement("ak-expandable-table-test-sort")
+@customElement("ak-table-view-test-sort")
 export class SimpleTableSortTest extends LitElement {
+    @property({ attribute: true, type: Boolean })
+    multiple = false;
+
     @state()
     order = "name";
 
@@ -114,15 +112,21 @@ export class SimpleTableSortTest extends LitElement {
 
         const direction = this.sortDown ? "" : "-";
 
-        return html`<ak-expandable-table
+        return html`<ak-table-view
             .columns=${this.columns}
             .content=${this.content}
             .order="${direction}${this.order}"
+            ?multiple=${this.multiple}
+            enable-expand-all
             @tablesort=${onTableSort}
-        ></ak-expandable-table>`;
+        ></ak-table-view>`;
     }
 }
 
-export const TableWithSorting: Story = {
-    render: () => container(html`<ak-expandable-table-test-sort></ak-expandable-table-test-sort>`),
+export const SelectTableWithSorting: Story = {
+    render: () => container(html`<ak-table-view-test-sort></ak-table-view-test-sort>`),
+};
+
+export const MultiselectTableWithSorting: Story = {
+    render: () => container(html`<ak-table-view-test-sort multiple></ak-table-view-test-sort>`),
 };
