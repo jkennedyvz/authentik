@@ -72,6 +72,9 @@ export interface WizardStep {
 
     // If this step is "disabled," the prior step's next button will be disabled.
     disabled: boolean;
+
+    // If this step is "hidden," its name will not be shown in the sidebar
+    hidden: boolean;
 }
 
 export interface WizardPanel extends HTMLElement {

@@ -22,7 +22,6 @@ import { PolicyBinding } from "@goauthentik/api";
 
 // import { ifDefined } from "lit/directives/if-defined.js";
 import BasePanel from "../BasePanel";
-import "./ak-policy-binding-form.js";
 
 const COLUMNS = [
     [msg("Order"), "order"],

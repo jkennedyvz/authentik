@@ -65,15 +65,17 @@ export class AkWizard<D, Step extends WizardStep = WizardStep>
      */
     get stepLabels(): WizardStepLabel[] {
         let disabled = false;
-        return this.steps.map((step, index) => {
-            disabled = disabled || step.disabled;
-            return {
-                label: step.label,
-                active: index === this.currentStep,
-                index,
-                disabled,
-            };
-        });
+        return this.steps
+            .filter((step) => !step.hidden)
+            .map((step, index) => {
+                disabled = disabled || step.disabled;
+                return {
+                    label: step.label,
+                    active: index === this.currentStep,
+                    index,
+                    disabled,
+                };
+            });
     }
 
     /**

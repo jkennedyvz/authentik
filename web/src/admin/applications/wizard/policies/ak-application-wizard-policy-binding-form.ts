@@ -12,7 +12,18 @@ import { msg } from "@lit/localize";
 import { html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 
+import PFAlert from "@patternfly/patternfly/components/Alert/alert.css";
+import PFButton from "@patternfly/patternfly/components/Button/button.css";
+import PFCard from "@patternfly/patternfly/components/Card/card.css";
+import PFForm from "@patternfly/patternfly/components/Form/form.css";
+import PFFormControl from "@patternfly/patternfly/components/FormControl/form-control.css";
+import PFInputGroup from "@patternfly/patternfly/components/InputGroup/input-group.css";
+import PFSwitch from "@patternfly/patternfly/components/Switch/switch.css";
+import PFBase from "@patternfly/patternfly/patternfly-base.css";
+
 import { CoreApi, Group, PoliciesApi, Policy, PolicyBinding, User } from "@goauthentik/api";
+
+import BasePanel from "../BasePanel";
 
 const withQuery = <T>(search: string | undefined, args: T) => (search ? { ...args, search } : args);
 
@@ -29,8 +40,12 @@ const PASS_FAIL = [
     [msg("Don't Pass"), false, true],
 ].map(([label, value, d]) => ({ label, value, default: d }));
 
-@customElement("ak-policy-binding-form-view")
-export class PolicyBindingFormView extends AKElement {
+@customElement("ak-application-wizard-policy-binding-form")
+export class PolicyBindingFormView extends BasePanel {
+    static get styles() {
+        return [PFBase, PFCard, PFButton, PFForm, PFAlert, PFInputGroup, PFFormControl, PFSwitch];
+    }
+
     @state()
     policyGroupUser: target = target.policy;
 
@@ -115,7 +130,7 @@ export class PolicyBindingFormView extends AKElement {
     }
 
     render() {
-        return html` <div class="pf-c-card pf-m-selectable pf-m-selected">
+        return html` 
             <div class="pf-c-card__body">${this.renderModeSelector()}</div>
             <div class="pf-c-card__footer">
                 ${this.renderSearch(
@@ -161,6 +176,6 @@ export class PolicyBindingFormView extends AKElement {
 
 declare global {
     interface HTMLElementTagNameMap {
-        "ak-policy-binding-form-view": PolicyBindingFormView;
+        "ak-application-wizard-policy-binding-form": PolicyBindingFormView;
     }
 }
