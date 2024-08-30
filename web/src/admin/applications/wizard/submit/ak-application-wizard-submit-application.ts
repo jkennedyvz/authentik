@@ -28,7 +28,7 @@ import {
 } from "@goauthentik/api";
 
 import BasePanel from "../BasePanel";
-import providerModelsList from "../auth-method-choice/ak-application-wizard-authentication-method-choice.choices";
+import providerModelsList from "../provider-choice/ak-application-wizard-provider-choice.choices.js";
 
 function cleanApplication(app: Partial<ApplicationRequest>): ApplicationRequest {
     return {
@@ -69,8 +69,8 @@ const successState: State = {
     icon: ["fa-check-circle", "pf-m-success"],
 };
 
-@customElement("ak-application-wizard-commit-application")
-export class ApplicationWizardCommitApplication extends BasePanel {
+@customElement("ak-application-wizard-submit-application")
+export class ApplicationWizardSubmitApplication extends BasePanel {
     static get styles() {
         return [
             ...super.styles,
@@ -87,7 +87,7 @@ export class ApplicationWizardCommitApplication extends BasePanel {
     }
 
     @state()
-    commitState: State = idleState;
+    submitState: State = idleState;
 
     @state()
     errors?: ValidationError;
@@ -95,9 +95,9 @@ export class ApplicationWizardCommitApplication extends BasePanel {
     response?: TransactionApplicationResponse;
 
     willUpdate(_changedProperties: PropertyValues<this>) {
-        if (this.commitState === idleState) {
+        if (this.submitState === idleState) {
             this.response = undefined;
-            this.commitState = runningState;
+            this.submitState = runningState;
             const providerModel = providerModelsList.find(
                 ({ formName }) => formName === this.wizard.providerModel,
             );
@@ -129,7 +129,7 @@ export class ApplicationWizardCommitApplication extends BasePanel {
                 this.response = response;
                 this.dispatchCustomEvent(EVENT_REFRESH);
                 this.dispatchWizardUpdate({ status: "submitted" });
-                this.commitState = successState;
+                this.submitState = successState;
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .catch(async (resolution: any) => {
@@ -143,7 +143,7 @@ export class ApplicationWizardCommitApplication extends BasePanel {
                     },
                     status: "failed",
                 });
-                this.commitState = errorState;
+                this.submitState = errorState;
             });
     }
 
@@ -184,7 +184,7 @@ export class ApplicationWizardCommitApplication extends BasePanel {
 
     render() {
         const icon = classMap(
-            this.commitState.icon.reduce((acc, icon) => ({ ...acc, [icon]: true }), {}),
+            this.submitState.icon.reduce((acc, icon) => ({ ...acc, [icon]: true }), {}),
         );
 
         return html`
@@ -197,10 +197,10 @@ export class ApplicationWizardCommitApplication extends BasePanel {
                                 aria-hidden="true"
                             ></i>
                             <h1
-                                data-commit-state=${this.commitState.state}
+                                data-submit-state=${this.submitState.state}
                                 class="pf-c-title pf-m-lg"
                             >
-                                ${this.commitState.label}
+                                ${this.submitState.label}
                             </h1>
                             ${this.renderErrors(this.errors)}
                         </div>
@@ -211,10 +211,10 @@ export class ApplicationWizardCommitApplication extends BasePanel {
     }
 }
 
-export default ApplicationWizardCommitApplication;
+export default ApplicationWizardSubmitApplication;
 
 declare global {
     interface HTMLElementTagNameMap {
-        "ak-application-wizard-commit-application": ApplicationWizardCommitApplication;
+        "ak-application-wizard-submit-application": ApplicationWizardSubmitApplication;
     }
 }

@@ -6,7 +6,10 @@ import { msg } from "@lit/localize";
 import { customElement, state } from "lit/decorators.js";
 
 import { applicationWizardContext } from "./ContextIdentity";
-import { newSteps } from "./steps";
+import { ApplicationDetailsStep } from "./application/ApplicationDetailsStep.js";
+import { ProviderChoiceStep } from "./provider-choice/ProviderChoiceStep.js";
+import { ProviderStep } from "./providers/ProviderStep.js";
+import { SubmitApplicationStep } from "./submit/SubmitApplicationStep.js";
 import {
     ApplicationStep,
     ApplicationWizardState,
@@ -28,7 +31,6 @@ export class ApplicationWizard extends CustomListenerElement(
 ) {
     constructor() {
         super(msg("Create With Wizard"), msg("New application"), msg("Create a new application"));
-        this.steps = newSteps();
     }
 
     /**
@@ -90,8 +92,26 @@ export class ApplicationWizard extends CustomListenerElement(
         this.requestUpdate();
     }
 
+    newSteps() {
+        const stepsInOrder = [
+            ApplicationDetailsStep,
+            ProviderChoiceStep,
+            ProviderStep,
+            // BindingsChoiceStep,
+            // BindingStep,
+            SubmitApplicationStep,
+        ];
+
+        return stepsInOrder.map((Step) => new Step(this.wizardState));
+    }
+
+    connectedCallback() {
+        super.connectedCallback();
+        this.steps = this.newSteps();
+    }
+
     close() {
-        this.steps = newSteps();
+        this.steps = this.newSteps();
         this.currentStep = 0;
         this.wizardState = freshWizardState();
         this.providerCache = new Map();

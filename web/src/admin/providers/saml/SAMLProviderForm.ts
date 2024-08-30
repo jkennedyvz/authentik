@@ -1,7 +1,7 @@
 import {
     digestAlgorithmOptions,
     signatureAlgorithmOptions,
-} from "@goauthentik/admin/applications/wizard/methods/saml/SamlProviderOptions";
+} from "@goauthentik/admin/applications/wizard/providers/saml/SamlProviderOptions";
 import "@goauthentik/admin/common/ak-crypto-certificate-search";
 import AkCryptoCertificateSearch from "@goauthentik/admin/common/ak-crypto-certificate-search";
 import "@goauthentik/admin/common/ak-flow-search/ak-flow-search";
