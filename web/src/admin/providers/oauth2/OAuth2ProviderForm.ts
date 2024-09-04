@@ -130,15 +130,20 @@ export class OAuth2ProviderFormPage extends BaseProviderForm<OAuth2Provider> {
     @state()
     showClientSecret = true;
 
+    @state()
+    selected: string[] = [];
+
     async loadInstance(pk: number): Promise<OAuth2Provider> {
         const provider = await new ProvidersApi(DEFAULT_CONFIG).providersOauth2Retrieve({
             id: pk,
         });
         this.showClientSecret = provider.clientType === ClientTypeEnum.Confidential;
+        this.selected = provider.propertyMappings || [];
         return provider;
     }
 
     async send(data: OAuth2Provider): Promise<OAuth2Provider> {
+        data.propertyMappings = this.selected;
         if (this.instance) {
             return new ProvidersApi(DEFAULT_CONFIG).providersOauth2Update({
                 id: this.instance.pk,
@@ -287,6 +292,9 @@ export class OAuth2ProviderFormPage extends BaseProviderForm<OAuth2Provider> {
                             )}
                             available-label=${msg("Available Scopes")}
                             selected-label=${msg("Selected Scopes")}
+                            @change=${(ev: CustomEvent) => {
+                                this.selected = ev.detail.selected;
+                            }}
                         ></ak-dual-select-dynamic-selected>
 
                         <p class="pf-c-form__helper-text">

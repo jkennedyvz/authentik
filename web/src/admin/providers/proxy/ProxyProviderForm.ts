@@ -45,6 +45,7 @@ export class ProxyProviderFormPage extends BaseProviderForm<ProxyProvider> {
         });
         this.showHttpBasic = first(provider.basicAuthEnabled, true);
         this.mode = first(provider.mode, ProxyMode.Proxy);
+        this.selected = provider.propertyMappings || [];
         return provider;
     }
 
@@ -54,8 +55,12 @@ export class ProxyProviderFormPage extends BaseProviderForm<ProxyProvider> {
     @state()
     mode: ProxyMode = ProxyMode.Proxy;
 
+    @state()
+    selected: string[] = [];
+
     async send(data: ProxyProvider): Promise<ProxyProvider> {
         data.mode = this.mode;
+        data.propertyMappings = this.selected;
         if (this.mode !== ProxyMode.ForwardDomain) {
             data.cookieDomain = "";
         }
@@ -319,6 +324,9 @@ export class ProxyProviderFormPage extends BaseProviderForm<ProxyProvider> {
                             )}
                             available-label="${msg("Available Scopes")}"
                             selected-label="${msg("Selected Scopes")}"
+                            @change=${(ev: CustomEvent) => {
+                                this.selected = ev.detail.selected;
+                            }}
                         ></ak-dual-select-dynamic-selected>
                         <p class="pf-c-form__helper-text">
                             ${msg("Additional scope mappings, which are passed to the proxy.")}
